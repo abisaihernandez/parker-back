@@ -138,7 +138,7 @@ export class LotsService {
     return null;
   }
 
-  async getLotFromSpotId(spotId: number): Promise<LotSelect | null> {
+  async getLotFromSpotId(spotId: number) {
     const spotResult = await this.dbService.db.query.spot.findFirst({
       where: eq(spot.id, spotId),
     });
@@ -151,5 +151,13 @@ export class LotsService {
     });
 
     return this.serializeLot(lotResult);
+  }
+
+  async getUserLots(userId: number) {
+    return (
+      await this.dbService.db.query.lot.findMany({
+        where: eq(lot.ownerId, userId),
+      })
+    ).map(this.serializeLot);
   }
 }

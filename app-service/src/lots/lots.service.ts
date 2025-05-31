@@ -65,4 +65,12 @@ export class LotsService {
       }),
     );
   }
+
+  async getUserLots(userId: number): Promise<Array<LotPayload> | null> {
+    return firstValueFrom(
+      this.lotsClient.send<Array<LotPayload> | null>('get_user_lots', {
+        userId,
+      }),
+    )
+  }
 }

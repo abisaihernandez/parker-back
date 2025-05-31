@@ -70,4 +70,10 @@ export class LotsController {
     }
     return this.lotsService.deleteLot(id);
   }
+
+  @Get('/owned')
+  @UseAuth()
+  async getOwnedLots(@User() user: UserPayload) {
+    return this.lotsService.getUserLots(user.id);
+  }
 }

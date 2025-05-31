@@ -51,12 +51,17 @@ export class LotsController {
 
   @MessagePattern('get_available_spot_id')
   async getAvailableSpotId({ lotId }: { lotId: number }) {
-    const availableSpot = await this.lotsService.findAvailableSpot(lotId)
+    const availableSpot = await this.lotsService.findAvailableSpot(lotId);
     return availableSpot?.id || null;
   }
 
   @MessagePattern('get_lot_from_spot_id')
-  async getLotFromSpotId({ spotId }: { spotId: number}) {
+  async getLotFromSpotId({ spotId }: { spotId: number }) {
     return this.lotsService.getLotFromSpotId(spotId);
+  }
+
+  @MessagePattern('get_user_lots')
+  async getUserLots({ userId }: { userId: number }) {
+    return this.lotsService.getUserLots(userId);
   }
 }
