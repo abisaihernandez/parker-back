@@ -41,6 +41,11 @@ export class GetLotsQueryDto {
   @IsOptional()
   @Type(() => Boolean)
   withAvailability?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  ownerId?: number
 }
 
 export type LotEditableFields = Pick<LotInsert, 'address' | 'name'> & {

@@ -13,5 +13,5 @@ type ReservationStatus =
   | 'pending'
   | 'active'
   | 'completed'
-  | 'cancelled'
+  | 'canceled'
   | 'expired';

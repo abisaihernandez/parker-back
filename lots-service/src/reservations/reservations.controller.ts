@@ -13,8 +13,12 @@ export class ReservationsController {
   }
 
   @EventPattern('reservation_canceled')
-  @EventPattern('reservation_expired')
   async handleReservationCanceled(data: ReservationPayload) {
+    await this.spotsService.markSpotAsAvailable(data.spotId);
+  }
+
+  @EventPattern('reservation_expired')
+  async handleReservationExpired(data: ReservationPayload) {
     await this.spotsService.markSpotAsAvailable(data.spotId);
   }
 }
