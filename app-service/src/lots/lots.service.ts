@@ -34,7 +34,11 @@ export class LotsService {
     );
   }
 
-  async getLots(config: { withAvailability?: boolean; bounds?: Bounds }) {
+  async getLots(config: {
+    withAvailability?: boolean;
+    bounds?: Bounds;
+    ownerId?: number;
+  }) {
     return firstValueFrom(this.lotsClient.send('get_lots', config));
   }
 
@@ -64,13 +68,5 @@ export class LotsService {
         spotId,
       }),
     );
-  }
-
-  async getUserLots(userId: number): Promise<Array<LotPayload> | null> {
-    return firstValueFrom(
-      this.lotsClient.send<Array<LotPayload> | null>('get_user_lots', {
-        userId,
-      }),
-    )
   }
 }
