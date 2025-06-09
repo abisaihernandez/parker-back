@@ -58,4 +58,16 @@ export class ReservationsService {
       ),
     );
   }
+
+  async userCurrentReservationCheckIn(userId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>('user_current_reservation_check_in', { userId })
+    )
+  }
+
+  async userCurrentReservationCheckOut(userId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>('user_current_reservation_check_out', { userId })
+    )
+  }
 }

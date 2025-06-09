@@ -32,4 +32,16 @@ export class ReservationsController {
   async cancelCurrentUserReservation(@User() user: UserPayload) {
     return this.reservationsService.cancelUserCurrentReservation(user.id);
   }
+
+  @Post('current/check-in')
+  @UseAuth()
+  async checkInCurrentUserReservation(@User() user: UserPayload) {
+    return this.reservationsService.userCurrentReservationCheckIn(user.id)
+  }
+
+  @Post('current/check-out')
+  @UseAuth()
+  async checkOutCurrentUserReservation(@User() user: UserPayload) {
+    return this.reservationsService.userCurrentReservationCheckOut(user.id)
+  }
 }

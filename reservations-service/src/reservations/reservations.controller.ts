@@ -36,4 +36,14 @@ export class ReservationsController {
   async cancelUserCurrentReservation({ userId }: { userId: number }) {
     return this.reservationsService.cancelUserCurrentReservation(userId);
   }
+
+  @MessagePattern('user_current_reservation_check_in')
+  async userCurrentReservationCheckIn({ userId }: { userId: number }) {
+    return this.reservationsService.userCurrentReservationCheckIn(userId);
+  }
+
+  @MessagePattern('user_current_reservation_check_out')
+  async userCurrentReservationCheckOut({ userId }: { userId: number }) {
+    return this.reservationsService.userCurrentReservationCheckOut(userId);
+  }
 }

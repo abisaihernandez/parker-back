@@ -8,10 +8,11 @@ export type ReservationPayload = {
   id: number;
   userId: number;
   spotId: number;
-  createdAt: string;
-  updatedAt: string;
-  startsAt: string;
-  endsAt: string;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  checkInAt: string | null;
+  checkOutAt: string | null;
   status: ReservationStatus;
 };
 
@@ -19,5 +20,5 @@ type ReservationStatus =
   | 'pending'
   | 'active'
   | 'completed'
-  | 'cancelled'
+  | 'canceled'
   | 'expired';
