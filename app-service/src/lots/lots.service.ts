@@ -30,7 +30,7 @@ export class LotsService {
 
   async updateLot(lotId: number, updatedData: Partial<LotEditableFields>) {
     return firstValueFrom(
-      this.lotsClient.send('update_lot', { lotId, data: updatedData }),
+      this.lotsClient.send('update_lot', { id: lotId, data: updatedData }),
     );
   }
 
