@@ -12,6 +12,11 @@ export class LotsController {
     return await this.lotsService.getLots(config);
   }
 
+  @MessagePattern('get_lot')
+  async getLot({ lotId }: { lotId: number }) {
+    return await this.lotsService.getLotById(lotId);
+  }
+
   @MessagePattern('create_lot')
   async createLot({
     creatorId,

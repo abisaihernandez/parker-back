@@ -2,16 +2,13 @@ import { /* Inject, */ Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { Bounds, LotEditableFields, LotSelect } from './types';
 import { lot } from 'src/db/schema/lot';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, count, eq, sql } from 'drizzle-orm';
 import { spot } from 'src/db/schema/spot';
-// import { RESERVATIONS_SERVICE } from 'src/constants/services';
-// import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class LotsService {
   constructor(
     private dbService: DbService,
-    // @Inject(RESERVATIONS_SERVICE) reservationsService: ClientProxy
   ) {}
 
   async createLot(
@@ -159,5 +156,24 @@ export class LotsService {
         where: eq(lot.ownerId, userId),
       })
     ).map(this.serializeLot);
+  }
+
+  async getLotById(lotId: number) {
+    const lotResult = await this.dbService.db.query.lot.findFirst({
+      where: eq(lot.id, lotId),
+    });
+
+    if (!lotResult) return null;
+
+    const [ spotsCountResult ] = await this.dbService.db.select({ spotsCount: count(spot.id) }).from(spot).where(eq(spot.lotId, lotId));
+    const { spotsCount } = spotsCountResult;
+
+
+    // @ts-ignore -- TODO: fix Drizzle mess
+    return this.serializeLot({
+      ...lotResult,
+      // @ts-ignore -- we need this too
+      spotsCount
+    });
   }
 }

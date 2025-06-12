@@ -69,4 +69,12 @@ export class LotsService {
       }),
     );
   }
+
+  async getLot(lotId: number): Promise<LotPayload | null> {
+    return firstValueFrom(
+      this.lotsClient.send<LotPayload | null>('get_lot', {
+        lotId,
+      }),
+    );
+  }
 }

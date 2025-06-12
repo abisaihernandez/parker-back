@@ -74,10 +74,14 @@ export class LotsController {
   @Get('/owned')
   @UseAuth()
   async getOwnedLots(@User() user: UserPayload) {
-    const result = await this.lotsService.getLots({
+    return await this.lotsService.getLots({
       withAvailability: true,
       ownerId: user.id,
     });
-    return result;
+  }
+
+  @Get('/:id')
+  async getLot(@Param('id', ParseIntPipe) id: number) {
+    return this.lotsService.getLot(id);
   }
 }
