@@ -91,4 +91,20 @@ export class ReservationsService {
       ),
     );
   }
+
+  async getReservation(id: number) {
+    const reservation = await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload>(
+        'get_reservation_by_id',
+        { id },
+      ),
+    );
+
+    const lot = await this.lotsService.getLotFromSpotId(reservation.spotId);
+
+    return {
+      ...reservation,
+      lot,
+    };
+  }
 }

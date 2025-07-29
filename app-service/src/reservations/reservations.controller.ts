@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserPayload } from 'src/constants/types';
 import { UseAuth } from 'src/identity/decorators/use-auth.decorator';
 import { User } from 'src/identity/decorators/user.decorator';
@@ -36,12 +36,18 @@ export class ReservationsController {
   @Post('current/check-in')
   @UseAuth()
   async checkInCurrentUserReservation(@User() user: UserPayload) {
-    return this.reservationsService.userCurrentReservationCheckIn(user.id)
+    return this.reservationsService.userCurrentReservationCheckIn(user.id);
   }
 
   @Post('current/check-out')
   @UseAuth()
   async checkOutCurrentUserReservation(@User() user: UserPayload) {
-    return this.reservationsService.userCurrentReservationCheckOut(user.id)
+    return this.reservationsService.userCurrentReservationCheckOut(user.id);
+  }
+
+  @Get(':id')
+  @UseAuth()
+  async getReservation(@Param('id') id: number) {
+    return this.reservationsService.getReservation(id);
   }
 }

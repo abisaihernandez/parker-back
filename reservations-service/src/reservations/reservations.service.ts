@@ -137,4 +137,10 @@ export class ReservationsService {
       where: inArray(reservation.spotId, spotIds),
     });
   }
+
+  async getReservationById(id: number) {
+    return await this.dbService.db.query.reservation.findFirst({
+      where: eq(reservation.id, id),
+    });
+  }
 }
