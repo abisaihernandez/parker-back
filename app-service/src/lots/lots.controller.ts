@@ -80,6 +80,12 @@ export class LotsController {
     });
   }
 
+  @Get('/owned/reservations')
+  @UseAuth()
+  async getReservationsOnOwnedLots(@User() user: UserPayload) {
+    return await this.lotsService.getReservationsOnOwnedLots(user.id);
+  }
+
   @Get('/:id')
   async getLot(@Param('id', ParseIntPipe) id: number) {
     return this.lotsService.getLot(id);

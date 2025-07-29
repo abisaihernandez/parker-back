@@ -46,4 +46,9 @@ export class ReservationsController {
   async userCurrentReservationCheckOut({ userId }: { userId: number }) {
     return this.reservationsService.userCurrentReservationCheckOut(userId);
   }
+
+  @MessagePattern('get_reservations_on_spots')
+  async getReservationsOnSpots({ spotIds }: { spotIds: number[] }) {
+    return this.reservationsService.getReservationsOnSpots(spotIds);
+  }
 }

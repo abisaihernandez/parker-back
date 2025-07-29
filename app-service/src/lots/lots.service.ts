@@ -1,12 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LOTS_SERVICE } from 'src/constants/services';
 import { Bounds, LotEditableFields, LotPayload } from './types';
 import { firstValueFrom } from 'rxjs';
+import { ReservationsService } from 'src/reservations/reservations.service';
 
 @Injectable()
 export class LotsService {
-  constructor(@Inject(LOTS_SERVICE) private readonly lotsClient: ClientProxy) {}
+  constructor(
+    @Inject(LOTS_SERVICE) private readonly lotsClient: ClientProxy,
+    @Inject(forwardRef(() => ReservationsService))
+    private readonly reservationsService: ReservationsService,
+  ) {}
 
   async createLot(
     creatorId: number,
@@ -39,7 +44,9 @@ export class LotsService {
     bounds?: Bounds;
     ownerId?: number;
   }) {
-    return firstValueFrom(this.lotsClient.send('get_lots', config));
+    return firstValueFrom(
+      this.lotsClient.send<LotPayload[]>('get_lots', config),
+    );
   }
 
   async deleteLot(lotId: number) {
@@ -76,5 +83,47 @@ export class LotsService {
         lotId,
       }),
     );
+  }
+
+  async getOwnedSpots(
+    ownerId: number,
+  ): Promise<Array<{ id: number; lotId: number }> | null> {
+    return firstValueFrom(
+      this.lotsClient.send<Array<{ id: number; lotId: number }> | null>(
+        'get_owned_spot_ids',
+        { ownerId },
+      ),
+    );
+  }
+
+  async getReservationsOnOwnedLots(ownerId: number) {
+    const ownedLots = await this.getLots({ ownerId });
+    const ownedSpots = await this.getOwnedSpots(ownerId);
+
+    if (!ownedSpots) throw new Error('Unable to fetch owned spots');
+
+    const reservationsOnOwnedSpots =
+      await this.reservationsService.getReservationsOnSpots(
+        ownedSpots.map(({ id }) => id),
+      );
+
+    return reservationsOnOwnedSpots?.map((reservation) => {
+      const reservedSpot = ownedSpots.find(
+        (spot) => spot.id === reservation.spotId,
+      );
+
+      if (!reservedSpot) {
+        throw new Error('Unable to find reserved spot');
+      }
+
+      const reservedLot = ownedLots.find(
+        (lot) => lot.id === reservedSpot.lotId,
+      );
+
+      return {
+        ...reservation,
+        lot: reservedLot,
+      };
+    });
   }
 }

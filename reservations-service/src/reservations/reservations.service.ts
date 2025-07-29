@@ -131,4 +131,10 @@ export class ReservationsService {
 
     return checkedInReservation;
   }
+
+  async getReservationsOnSpots(spotIds: number[]) {
+    return await this.dbService.db.query.reservation.findMany({
+      where: inArray(reservation.spotId, spotIds),
+    });
+  }
 }

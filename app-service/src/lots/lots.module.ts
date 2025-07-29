@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { LotsService } from './lots.service';
 import { LotsController } from './lots.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LOTS_SERVICE } from 'src/constants/services';
 import { ConfigService } from '@nestjs/config';
+import { ReservationsModule } from 'src/reservations/reservations.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ConfigService } from '@nestjs/config';
         inject: [ConfigService],
       },
     ]),
+    forwardRef(() => ReservationsModule),
   ],
   providers: [LotsService],
   exports: [LotsService],

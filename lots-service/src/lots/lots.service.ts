@@ -7,9 +7,7 @@ import { spot } from 'src/db/schema/spot';
 
 @Injectable()
 export class LotsService {
-  constructor(
-    private dbService: DbService,
-  ) {}
+  constructor(private dbService: DbService) {}
 
   async createLot(
     ownerId: number,
@@ -165,15 +163,25 @@ export class LotsService {
 
     if (!lotResult) return null;
 
-    const [ spotsCountResult ] = await this.dbService.db.select({ spotsCount: count(spot.id) }).from(spot).where(eq(spot.lotId, lotId));
+    const [spotsCountResult] = await this.dbService.db
+      .select({ spotsCount: count(spot.id) })
+      .from(spot)
+      .where(eq(spot.lotId, lotId));
     const { spotsCount } = spotsCountResult;
-
 
     // @ts-ignore -- TODO: fix Drizzle mess
     return this.serializeLot({
       ...lotResult,
       // @ts-ignore -- we need this too
-      spotsCount
+      spotsCount,
     });
+  }
+
+  async getOwnedSpotIds(ownerId: number) {
+    return this.dbService.db
+      .select({ id: spot.id, lotId: spot.lotId })
+      .from(spot)
+      .leftJoin(lot, eq(spot.lotId, lot.id))
+      .where(eq(lot.ownerId, ownerId));
   }
 }

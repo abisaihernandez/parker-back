@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { RESERVATIONS_SERVICE } from 'src/constants/services';
@@ -10,6 +15,7 @@ export class ReservationsService {
   constructor(
     @Inject(RESERVATIONS_SERVICE)
     private readonly reservationsClient: ClientProxy,
+    @Inject(forwardRef(() => LotsService))
     private readonly lotsService: LotsService,
   ) {}
 
@@ -61,13 +67,28 @@ export class ReservationsService {
 
   async userCurrentReservationCheckIn(userId: number) {
     return await firstValueFrom(
-      this.reservationsClient.send<ReservationPayload | null>('user_current_reservation_check_in', { userId })
-    )
+      this.reservationsClient.send<ReservationPayload | null>(
+        'user_current_reservation_check_in',
+        { userId },
+      ),
+    );
   }
 
   async userCurrentReservationCheckOut(userId: number) {
     return await firstValueFrom(
-      this.reservationsClient.send<ReservationPayload | null>('user_current_reservation_check_out', { userId })
-    )
+      this.reservationsClient.send<ReservationPayload | null>(
+        'user_current_reservation_check_out',
+        { userId },
+      ),
+    );
+  }
+
+  async getReservationsOnSpots(spotIds: number[]) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload[]>(
+        'get_reservations_on_spots',
+        { spotIds },
+      ),
+    );
   }
 }
