@@ -62,4 +62,10 @@ export class ReservationsController {
       user.id,
     );
   }
+
+  @Post(':id/check-out')
+  @UseAuth()
+  async checkOut(@Param('id') id: number) {
+    return this.reservationsService.checkOut(id);
+  }
 }

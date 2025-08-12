@@ -147,4 +147,12 @@ export class ReservationsService {
 
     return Array.from(actions);
   }
+
+  async checkOut(reservationId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>('check_out', {
+        id: reservationId,
+      }),
+    );
+  }
 }

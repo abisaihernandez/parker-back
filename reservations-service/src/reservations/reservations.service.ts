@@ -107,13 +107,7 @@ export class ReservationsService {
       throw new Error('User does not have active reservation');
     }
 
-    const checkedInReservation = await this.dbService.db
-      .update(reservation)
-      .set({ status: 'active', checkInAt: new Date() })
-      .where(eq(reservation.id, currentReservation.id))
-      .returning();
-
-    return checkedInReservation;
+    return this.checkIn(currentReservation.id);
   }
 
   async userCurrentReservationCheckOut(userId: number) {
@@ -123,13 +117,7 @@ export class ReservationsService {
       throw new Error('User does not have active reservation');
     }
 
-    const checkedInReservation = await this.dbService.db
-      .update(reservation)
-      .set({ status: 'completed', checkOutAt: new Date() })
-      .where(eq(reservation.id, currentReservation.id))
-      .returning();
-
-    return checkedInReservation;
+    return this.checkOut(currentReservation.id);
   }
 
   async getReservationsOnSpots(spotIds: number[]) {
@@ -142,5 +130,25 @@ export class ReservationsService {
     return await this.dbService.db.query.reservation.findFirst({
       where: eq(reservation.id, id),
     });
+  }
+
+  async checkOut(id: number) {
+    const checkedOutReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'completed', checkOutAt: new Date() })
+      .where(eq(reservation.id, id))
+      .returning();
+
+    return checkedOutReservation;
+  }
+
+  async checkIn(id: number) {
+    const checkedInReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'active', checkInAt: new Date() })
+      .where(eq(reservation.id, id))
+      .returning();
+
+    return checkedInReservation;
   }
 }

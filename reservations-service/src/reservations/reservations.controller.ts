@@ -56,4 +56,14 @@ export class ReservationsController {
   async getReservationById({ id }: { id: number }) {
     return this.reservationsService.getReservationById(id);
   }
+
+  @MessagePattern('check_out')
+  async checkOut({ id }: { id: number }) {
+    return this.reservationsService.checkOut(id);
+  }
+
+  @MessagePattern('check_in')
+  async checkIn({ id }: { id: number }) {
+    return this.reservationsService.checkIn(id);
+  }
 }
