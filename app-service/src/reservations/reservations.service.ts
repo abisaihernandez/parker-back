@@ -7,7 +7,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { RESERVATIONS_SERVICE } from 'src/constants/services';
-import { ReservationPayload } from './types';
+import { ReservationActionType, ReservationPayload } from './types';
 import { LotsService } from 'src/lots/lots.service';
 
 @Injectable()
@@ -92,19 +92,59 @@ export class ReservationsService {
     );
   }
 
-  async getReservation(id: number) {
-    const reservation = await firstValueFrom(
+  private getReservationById(id: number) {
+    return firstValueFrom(
       this.reservationsClient.send<ReservationPayload>(
         'get_reservation_by_id',
         { id },
       ),
     );
+  }
 
+  async getReservation(id: number) {
+    const reservation = await this.getReservationById(id);
     const lot = await this.lotsService.getLotFromSpotId(reservation.spotId);
 
     return {
       ...reservation,
       lot,
     };
+  }
+
+  async getReservationActionsForUser(
+    reservationId: number,
+    userId: number,
+  ): Promise<ReservationActionType[]> {
+    const reservation = await this.getReservationById(reservationId);
+    const lot = await this.lotsService.getLotFromSpotId(reservation.spotId);
+
+    if (!reservation || !lot) return [];
+
+    const didUserMakeReservation = reservation.userId === userId;
+    const wasReservationMadeInUserLot = lot.ownerId === userId;
+
+    const actions = new Set<ReservationActionType>();
+
+    switch (reservation.status) {
+      case 'pending':
+        if (didUserMakeReservation) {
+          actions.add('check-in');
+          actions.add('cancel');
+        } else if (wasReservationMadeInUserLot) {
+          actions.add('cancel');
+        }
+        break;
+      case 'active':
+        if (didUserMakeReservation) {
+          actions.add('check-out');
+        }
+        break;
+      case 'completed':
+      case 'canceled':
+      case 'expired':
+        break;
+    }
+
+    return Array.from(actions);
   }
 }

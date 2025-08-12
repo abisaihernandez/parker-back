@@ -50,4 +50,16 @@ export class ReservationsController {
   async getReservation(@Param('id') id: number) {
     return this.reservationsService.getReservation(id);
   }
+
+  @Get(':id/actions')
+  @UseAuth()
+  async getReservationActionsForUser(
+    @Param('id') reservationId: number,
+    @User() user: UserPayload,
+  ) {
+    return this.reservationsService.getReservationActionsForUser(
+      reservationId,
+      user.id,
+    );
+  }
 }
