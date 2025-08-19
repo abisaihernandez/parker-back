@@ -57,9 +57,24 @@ export class ReservationsController {
     return this.reservationsService.getReservationById(id);
   }
 
-  @MessagePattern('check_out')
-  async checkOut({ id }: { id: number }) {
-    return this.reservationsService.checkOut(id);
+  @MessagePattern('initiate_check_out')
+  async initiateCheckOut({ id }: { id: number }) {
+    return this.reservationsService.initiateCheckOut(id);
+  }
+
+  @MessagePattern('confirm_check_out')
+  async confirmCheckOut({ id }: { id: number }) {
+    return this.reservationsService.confirmCheckOut(id);
+  }
+
+  @MessagePattern('force_check_out')
+  async forceCheckOut({ id }: { id: number }) {
+    return this.reservationsService.forceCheckOut(id);
+  }
+
+  @MessagePattern('deny_check_out')
+  async denyCheckOut({ id }: { id: number }) {
+    return this.reservationsService.denyCheckOut(id);
   }
 
   @MessagePattern('check_in')

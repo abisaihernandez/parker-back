@@ -134,9 +134,16 @@ export class ReservationsService {
           actions.add('cancel');
         }
         break;
+      case 'check-out-initiated':
+        if (wasReservationMadeInUserLot) {
+          actions.add('confirm-check-out');
+        }
+        break;
       case 'active':
         if (didUserMakeReservation) {
-          actions.add('check-out');
+          actions.add('initiate-check-out');
+        } else if (wasReservationMadeInUserLot) {
+          actions.add('force-check-out');
         }
         break;
       case 'completed':
@@ -148,11 +155,47 @@ export class ReservationsService {
     return Array.from(actions);
   }
 
-  async checkOut(reservationId: number) {
+  async forceCheckOut(reservationId: number) {
     return await firstValueFrom(
-      this.reservationsClient.send<ReservationPayload | null>('check_out', {
-        id: reservationId,
-      }),
+      this.reservationsClient.send<ReservationPayload | null>(
+        'force_check_out',
+        {
+          id: reservationId,
+        },
+      ),
+    );
+  }
+
+  async initiateCheckOut(reservationId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'initiate_check_out',
+        {
+          id: reservationId,
+        },
+      ),
+    );
+  }
+
+  async confirmCheckOut(reservationId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'confirm_check_out',
+        {
+          id: reservationId,
+        },
+      ),
+    );
+  }
+
+  async denyCheckOut(reservationId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'deny_check_out',
+        {
+          id: reservationId,
+        },
+      ),
     );
   }
 }

@@ -20,7 +20,14 @@ type ReservationStatus =
   | 'pending'
   | 'active'
   | 'completed'
+  | 'check-out-initiated'
   | 'canceled'
   | 'expired';
 
-export type ReservationActionType = 'check-in' | 'check-out' | 'cancel';
+export type ReservationActionType =
+  | 'check-in'
+  | 'initiate-check-out'
+  | 'force-check-out'
+  | 'confirm-check-out'
+  | 'deny-check-out'
+  | 'cancel';

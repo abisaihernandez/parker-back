@@ -22,6 +22,13 @@
       "when": 1748213490348,
       "tag": "0002_add-reservation-status",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755040753730,
+      "tag": "0003_add-check-out-initiated-status",
+      "breakpoints": true
     }
   ]
 }

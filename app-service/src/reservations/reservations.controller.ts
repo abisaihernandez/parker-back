@@ -63,9 +63,27 @@ export class ReservationsController {
     );
   }
 
-  @Post(':id/check-out')
+  @Post(':id/initiate-check-out')
   @UseAuth()
-  async checkOut(@Param('id') id: number) {
-    return this.reservationsService.checkOut(id);
+  async initiateCheckOut(@Param('id') id: number) {
+    return this.reservationsService.initiateCheckOut(id);
+  }
+
+  @Post(':id/confirm-check-out')
+  @UseAuth()
+  async confirmCheckOut(@Param('id') id: number) {
+    return this.reservationsService.confirmCheckOut(id);
+  }
+
+  @Post(':id/force-check-out')
+  @UseAuth()
+  async forceCheckOut(@Param('id') id: number) {
+    return this.reservationsService.forceCheckOut(id);
+  }
+
+  @Post(':id/deny-check-out')
+  @UseAuth()
+  async denyCheckOut(@Param('id') id: number) {
+    return this.reservationsService.denyCheckOut(id);
   }
 }

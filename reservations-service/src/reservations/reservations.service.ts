@@ -113,11 +113,11 @@ export class ReservationsService {
   async userCurrentReservationCheckOut(userId: number) {
     const currentReservation = await this.getUserCurrentReservation(userId);
 
-    if (!currentReservation) {
+    if (!currentReservation || currentReservation.status !== 'active') {
       throw new Error('User does not have active reservation');
     }
 
-    return this.checkOut(currentReservation.id);
+    return this.initiateCheckOut(currentReservation.id);
   }
 
   async getReservationsOnSpots(spotIds: number[]) {
@@ -132,7 +132,47 @@ export class ReservationsService {
     });
   }
 
-  async checkOut(id: number) {
+  async initiateCheckOut(id: number) {
+    const checkedOutInitiatedReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'check-out-initiated' })
+      .where(eq(reservation.id, id))
+      .returning();
+
+    return checkedOutInitiatedReservation;
+  }
+
+  async confirmCheckOut(id: number) {
+    const confirmedCheckOutReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'completed' })
+      .where(
+        and(
+          eq(reservation.id, id),
+          eq(reservation.status, 'check-out-initiated'),
+        ),
+      )
+      .returning();
+
+    return confirmedCheckOutReservation;
+  }
+
+  async denyCheckOut(id: number) {
+    const checkedOutDeniedReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'active' })
+      .where(
+        and(
+          eq(reservation.id, id),
+          eq(reservation.status, 'check-out-initiated'),
+        ),
+      )
+      .returning();
+
+    return checkedOutDeniedReservation;
+  }
+
+  async forceCheckOut(id: number) {
     const checkedOutReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'completed', checkOutAt: new Date() })
