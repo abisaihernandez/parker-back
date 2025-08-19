@@ -64,7 +64,24 @@ export class LotsService {
     );
   }
 
-  async getLots(config: { withAvailability?: boolean; bounds?: Bounds }) {
+  async getLots(config: {
+    withAvailability?: boolean;
+    bounds?: Bounds;
+    ownerId?: number;
+  }) {
+    const boundsCondition = config.bounds
+      ? sql`ST_Contains(ST_MakeEnvelope(${
+          config.bounds.southWest.longitude
+        }, ${config.bounds.southWest.latitude}, ${
+          config.bounds.northEast.longitude
+        }, ${config.bounds.northEast.latitude}, 4326), ${lot.location})`
+      : undefined;
+
+    const lotsFilterCondition = and(
+      config.ownerId ? eq(lot.ownerId, config.ownerId) : undefined,
+      boundsCondition,
+    );
+
     const query = this.dbService.db
       .select(
         config.withAvailability
@@ -75,15 +92,7 @@ export class LotsService {
           : lot,
       )
       .from(lot)
-      .where(
-        config.bounds
-          ? sql`ST_Contains(ST_MakeEnvelope(${
-              config.bounds.southWest.longitude
-            }, ${config.bounds.southWest.latitude}, ${
-              config.bounds.northEast.longitude
-            }, ${config.bounds.northEast.latitude}, 4326), ${lot.location})`
-          : undefined,
-      );
+      .where(lotsFilterCondition);
 
     if (config.withAvailability) {
       const result = await query

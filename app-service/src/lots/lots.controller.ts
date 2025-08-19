@@ -75,7 +75,7 @@ export class LotsController {
   @UseAuth()
   async getOwnedLots(@User() user: UserPayload) {
     return await this.lotsService.getLots({
-      withAvailability: true,
+      withAvailability: false,
       ownerId: user.id,
     });
   }
