@@ -17,6 +17,11 @@ export class ReservationsController {
     await this.spotsService.markSpotAsAvailable(data.spotId);
   }
 
+  @EventPattern('reservation_completed')
+  async handleReservationCompleted(data: ReservationPayload) {
+    await this.spotsService.markSpotAsAvailable(data.spotId);
+  }
+
   @EventPattern('reservation_expired')
   async handleReservationExpired(data: ReservationPayload) {
     await this.spotsService.markSpotAsAvailable(data.spotId);

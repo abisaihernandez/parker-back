@@ -154,6 +154,11 @@ export class ReservationsService {
       )
       .returning();
 
+    this.rabbitMqClient.emit(
+      'reservation_completed',
+      confirmedCheckOutReservation,
+    );
+
     return confirmedCheckOutReservation;
   }
 
@@ -178,6 +183,8 @@ export class ReservationsService {
       .set({ status: 'completed', checkOutAt: new Date() })
       .where(eq(reservation.id, id))
       .returning();
+
+    this.rabbitMqClient.emit('reservation_completed', checkedOutReservation);
 
     return checkedOutReservation;
   }
