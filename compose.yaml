@@ -3,4 +3,5 @@ include:
   - path: lots-service/compose.yml
   - path: reservations-service/compose.yml
   - path: app-service/compose.yml
+  - path: notifications-service/compose.yml
 
