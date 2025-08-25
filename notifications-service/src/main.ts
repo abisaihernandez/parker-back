@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport } from '@nestjs/microservices';
-// import { ConfigService } from '@nestjs/config';
-// import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
+import { ConfigService } from '@nestjs/config';
+import { RmqUrl } from '@nestjs/microservices/external/rmq-url.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,7 +15,6 @@ async function bootstrap() {
     },
   });
 
-  /*
   const configService = app.get(ConfigService);
 
   app.connectMicroservice({
@@ -25,7 +24,6 @@ async function bootstrap() {
       queue: 'reservations',
     },
   });
-  */
 
   await app.startAllMicroservices();
 }
