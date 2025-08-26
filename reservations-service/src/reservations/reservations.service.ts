@@ -25,7 +25,7 @@ export class ReservationsService {
       throw new Error('User already has active reservation');
     }
 
-    const result = await this.dbService.db
+    const insertedReservations = await this.dbService.db
       .insert(reservation)
       .values({
         spotId,
@@ -34,7 +34,7 @@ export class ReservationsService {
       })
       .returning();
 
-    const createdReservation = result[0];
+    const createdReservation = insertedReservations[0];
 
     this.rabbitMqClient.emit('reservation_created', createdReservation);
 
@@ -79,7 +79,6 @@ export class ReservationsService {
         .where(eq(reservation.id, expiredReservation.id));
 
       this.rabbitMqClient.emit('reservation_expired', expiredReservation);
-      this.onReservationUpdated(expiredReservation);
     }
   }
 
@@ -90,16 +89,13 @@ export class ReservationsService {
       throw new Error('User does not have active reservation');
     }
 
-    const result = await this.dbService.db
+    const canceledReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'canceled' })
       .where(eq(reservation.id, currentReservation.id))
       .returning();
 
-    const canceledReservation = result[0];
-
     this.rabbitMqClient.emit('reservation_canceled', currentReservation);
-    this.onReservationUpdated(canceledReservation);
 
     return canceledReservation;
   }
@@ -137,20 +133,17 @@ export class ReservationsService {
   }
 
   async initiateCheckOut(id: number) {
-    const result = await this.dbService.db
+    const checkedOutInitiatedReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'check-out-initiated' })
       .where(eq(reservation.id, id))
       .returning();
 
-    const checkedOutInitiatedReservation = result[0];
-    this.onReservationUpdated(checkedOutInitiatedReservation);
-
     return checkedOutInitiatedReservation;
   }
 
   async confirmCheckOut(id: number) {
-    const result = await this.dbService.db
+    const confirmedCheckOutReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'completed' })
       .where(
@@ -161,19 +154,16 @@ export class ReservationsService {
       )
       .returning();
 
-    const confirmedCheckOutReservation = result[0];
-
     this.rabbitMqClient.emit(
       'reservation_completed',
       confirmedCheckOutReservation,
     );
-    this.onReservationUpdated(confirmedCheckOutReservation);
 
     return confirmedCheckOutReservation;
   }
 
   async denyCheckOut(id: number) {
-    const result = await this.dbService.db
+    const checkedOutDeniedReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'active' })
       .where(
@@ -184,41 +174,28 @@ export class ReservationsService {
       )
       .returning();
 
-    const checkedOutDeniedReservation = result[0];
-    this.onReservationUpdated(checkedOutDeniedReservation);
-
     return checkedOutDeniedReservation;
   }
 
   async forceCheckOut(id: number) {
-    const result = await this.dbService.db
+    const checkedOutReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'completed', checkOutAt: new Date() })
       .where(eq(reservation.id, id))
       .returning();
 
-    const checkedOutReservation = result[0];
-
     this.rabbitMqClient.emit('reservation_completed', checkedOutReservation);
-    this.onReservationUpdated(checkedOutReservation);
 
     return checkedOutReservation;
   }
 
   async checkIn(id: number) {
-    const result = await this.dbService.db
+    const checkedInReservation = await this.dbService.db
       .update(reservation)
       .set({ status: 'active', checkInAt: new Date() })
       .where(eq(reservation.id, id))
       .returning();
 
-    const checkedInReservation = result[0];
-    this.onReservationUpdated(checkedInReservation);
-
     return checkedInReservation;
-  }
-
-  onReservationUpdated(reservation: ReservationSelect) {
-    this.rabbitMqClient.emit('reservation_updated', reservation);
   }
 }
