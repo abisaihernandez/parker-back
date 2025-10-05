@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, UnauthorizedException } from '@nestjs/common';
 import { UserPayload } from 'src/constants/types';
 import { UseAuth } from 'src/identity/decorators/use-auth.decorator';
 import { User } from 'src/identity/decorators/user.decorator';
@@ -85,5 +85,17 @@ export class ReservationsController {
   @UseAuth()
   async denyCheckOut(@Param('id') id: number) {
     return this.reservationsService.denyCheckOut(id);
+  }
+
+  @Post(':id/cancel')
+  @UseAuth()
+  async cancelReservation(@Param('id') id: number, @User() user: UserPayload) {
+    const actions = await this.reservationsService.getReservationActionsForUser(id, user.id)
+
+    if (!actions.includes('cancel')) {
+      throw new ForbiddenException('User cannot cancel this reservation');
+    }
+
+    return this.reservationsService.cancelReservation(id);
   }
 }

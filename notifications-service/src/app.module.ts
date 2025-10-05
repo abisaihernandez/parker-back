@@ -1,21 +1,17 @@
 import { Module } from '@nestjs/common';
-import { HealthModule } from './health/health.module';
-import { IdentityModule } from './identity/identity.module';
 import { ConfigModule } from '@nestjs/config';
-import { LotsModule } from './lots/lots.module';
+import { HealthModule } from './health/health.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { RealtimeModule } from './realtime/realtime.module';
+import { AppModule as AppServiceModule } from './app/app.module';
 
 @Module({
   imports: [
-    HealthModule,
-    IdentityModule,
-    LotsModule,
-    ReservationsModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    HealthModule,
+    ReservationsModule,
     NotificationsModule,
-    RealtimeModule,
+    AppServiceModule,
   ],
   controllers: [],
   providers: [],

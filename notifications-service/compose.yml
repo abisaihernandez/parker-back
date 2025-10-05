@@ -1,0 +1,22 @@
+services:
+  notifications-service:
+    build:
+      context: .
+      target: development
+    environment:
+      NODE_ENV: development
+      RABBITMQ_URL: 'amqp://rabbitmq:5672'
+      APP_SERVICE_HOST: 'app-service'
+      APP_SERVICE_TCP_PORT: ${APP_SERVICE_TCP_PORT-3030}
+    ports:
+      - ${NOTIFICATIONS_SERVICE_PORT-3000}:3000
+    depends_on:
+      lots-service-db:
+        condition: service_healthy
+    volumes:
+      - ./src:/usr/src/app/src
+
+  rabbitmq:
+    image: 'rabbitmq:4-management'
+    ports:
+      - ${RABBITMQ_MANAGEMENT_PORT-15672}:15672
