@@ -37,6 +37,11 @@ export class ReservationsController {
     return this.reservationsService.cancelUserCurrentReservation(userId);
   }
 
+  @MessagePattern('cancel_reservation')
+  async cancelReservation({ id }: { id: number }) {
+    return this.reservationsService.cancelReservation(id);
+  }
+
   @MessagePattern('user_current_reservation_check_in')
   async userCurrentReservationCheckIn({ userId }: { userId: number }) {
     return this.reservationsService.userCurrentReservationCheckIn(userId);

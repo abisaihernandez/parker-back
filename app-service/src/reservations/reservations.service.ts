@@ -198,4 +198,15 @@ export class ReservationsService {
       ),
     );
   }
+
+  async cancelReservation(reservationId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'cancel_reservation',
+        {
+          id: reservationId,
+        },
+      ),
+    );
+  }
 }

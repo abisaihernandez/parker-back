@@ -90,18 +90,7 @@ export class ReservationsService {
       throw new Error('User does not have active reservation');
     }
 
-    const result = await this.dbService.db
-      .update(reservation)
-      .set({ status: 'canceled' })
-      .where(eq(reservation.id, currentReservation.id))
-      .returning();
-
-    const canceledReservation = result[0];
-
-    this.rabbitMqClient.emit('reservation_canceled', currentReservation);
-    this.onReservationUpdated(canceledReservation);
-
-    return canceledReservation;
+    return this.cancelReservation(currentReservation.id);
   }
 
   async userCurrentReservationCheckIn(userId: number) {
@@ -220,5 +209,20 @@ export class ReservationsService {
 
   onReservationUpdated(reservation: ReservationSelect) {
     this.rabbitMqClient.emit('reservation_updated', reservation);
+  }
+
+  async cancelReservation(id: number) {
+    const result = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'canceled' })
+      .where(eq(reservation.id, id))
+      .returning();
+
+    const canceledReservation = result[0];
+
+    this.rabbitMqClient.emit('reservation_canceled', canceledReservation);
+    this.onReservationUpdated(canceledReservation);
+
+    return canceledReservation;
   }
 }

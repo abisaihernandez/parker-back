@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LotsModule } from './lots/lots.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { RealtimeModule } from './realtime/realtime.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     ReservationsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     NotificationsModule,
+    RealtimeModule,
   ],
   controllers: [],
   providers: [],
