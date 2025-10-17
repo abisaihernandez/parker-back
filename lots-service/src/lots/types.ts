@@ -45,9 +45,14 @@ export class GetLotsQueryDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  ownerId?: number
+  ownerId?: number;
 }
 
 export type LotEditableFields = Pick<LotInsert, 'address' | 'name'> & {
   location: Coordinates;
+};
+
+export type GetLotsFromSpotIdsDto = {
+  lots: LotSelect[];
+  spotsToLots: Record<number, number>;
 };

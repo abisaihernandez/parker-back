@@ -19,6 +19,41 @@ export class ReservationsService {
     private readonly lotsService: LotsService,
   ) {}
 
+  async getReservations(madeByUserId: number, addLots: boolean) {
+    const reservations = await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload[] | null>(
+        'get_reservations',
+        { madeByUserId },
+      ),
+    );
+
+    if (!reservations) {
+      return [];
+    }
+
+    if (!addLots) {
+      return reservations;
+    }
+
+    const spotIds = new Set(reservations.map((r) => r.spotId));
+    const result = await this.lotsService.getLotsFromSpotIds(
+      Array.from(spotIds),
+    );
+
+    if (!result) {
+      throw new Error('Could not retrieve lots for reservation spots');
+    }
+
+    return reservations.map((reservation) => {
+      const reservationLotId = result.spotsToLots[reservation.spotId];
+
+      return {
+        ...reservation,
+        lot: result.lots.find((lot) => lot.id === reservationLotId),
+      };
+    });
+  }
+
   async createReservation(userId: number, lotId: number) {
     const availableSpotId = await this.lotsService.findAvailableSpotId(lotId);
 

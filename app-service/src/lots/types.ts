@@ -55,3 +55,8 @@ export type LotPayload = {
   };
   ownerId: number | null;
 };
+
+export type GetLotsFromSpotIdsDto = {
+  lots: LotPayload[];
+  spotsToLots: Record<number, number>;
+};

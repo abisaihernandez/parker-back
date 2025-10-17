@@ -1,4 +1,12 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UserPayload } from 'src/constants/types';
 import { UseAuth } from 'src/identity/decorators/use-auth.decorator';
 import { User } from 'src/identity/decorators/user.decorator';
@@ -8,6 +16,18 @@ import { CreateReservationRequestDto } from './dto/create-reservation.dto';
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
+
+  @Get('/')
+  @UseAuth()
+  async getReservations(
+    @User() user: UserPayload,
+    @Query('made_by') madeByUserId: number | 'me',
+  ) {
+    return this.reservationsService.getReservations(
+      madeByUserId === 'me' ? user.id : madeByUserId,
+      true,
+    );
+  }
 
   @Post('/')
   @UseAuth()
@@ -90,7 +110,10 @@ export class ReservationsController {
   @Post(':id/cancel')
   @UseAuth()
   async cancelReservation(@Param('id') id: number, @User() user: UserPayload) {
-    const actions = await this.reservationsService.getReservationActionsForUser(id, user.id)
+    const actions = await this.reservationsService.getReservationActionsForUser(
+      id,
+      user.id,
+    );
 
     if (!actions.includes('cancel')) {
       throw new ForbiddenException('User cannot cancel this reservation');

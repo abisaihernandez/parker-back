@@ -86,4 +86,9 @@ export class ReservationsController {
   async checkIn({ id }: { id: number }) {
     return this.reservationsService.checkIn(id);
   }
+
+  @MessagePattern('get_reservations')
+  async getReservations({ madeByUserId }: { madeByUserId: number }) {
+    return this.reservationsService.getReservations(madeByUserId);
+  }
 }

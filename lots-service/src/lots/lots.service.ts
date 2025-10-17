@@ -1,8 +1,13 @@
-import { /* Inject, */ Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { Bounds, LotEditableFields, LotSelect } from './types';
+import {
+  Bounds,
+  GetLotsFromSpotIdsDto,
+  LotEditableFields,
+  LotSelect,
+} from './types';
 import { lot } from 'src/db/schema/lot';
-import { and, count, eq, sql } from 'drizzle-orm';
+import { and, count, eq, inArray, sql } from 'drizzle-orm';
 import { spot } from 'src/db/schema/spot';
 
 @Injectable()
@@ -192,5 +197,24 @@ export class LotsService {
       .from(spot)
       .leftJoin(lot, eq(spot.lotId, lot.id))
       .where(eq(lot.ownerId, ownerId));
+  }
+
+  async getLotsFromSpotIds(spotIds: number[]): Promise<GetLotsFromSpotIdsDto> {
+    const result = await this.dbService.db
+      .select({
+        ...lot,
+        spotId: spot.id,
+      })
+      .from(spot)
+      .leftJoin(lot, eq(spot.lotId, lot.id))
+      .where(inArray(spot.id, spotIds));
+
+    return {
+      // @ts-ignore -- why do you do this to me, drizzle?
+      lots: result.map(({ spotId, ...lot }) => lot),
+      spotsToLots: Object.fromEntries(
+        result.map(({ spotId, id: lotId }) => [spotId, lotId]),
+      ),
+    };
   }
 }

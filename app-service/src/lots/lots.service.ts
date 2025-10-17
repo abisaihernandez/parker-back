@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LOTS_SERVICE } from 'src/constants/services';
-import { Bounds, LotEditableFields, LotPayload } from './types';
+import { Bounds, GetLotsFromSpotIdsDto, LotEditableFields, LotPayload } from './types';
 import { firstValueFrom } from 'rxjs';
 import { ReservationsService } from 'src/reservations/reservations.service';
 
@@ -19,7 +19,7 @@ export class LotsService {
     spotsCount: number,
   ) {
     return firstValueFrom(
-      this.lotsClient.send('create_lot', {
+      this.lotsClient.send<LotPayload>('create_lot', {
         creatorId,
         data,
         spotsCount,
@@ -28,13 +28,13 @@ export class LotsService {
   }
 
   async isLotOwner(lotId: number, userId: number) {
-    return firstValueFrom(
+    return firstValueFrom<boolean>(
       this.lotsClient.send('get_is_lot_owner', { id: lotId, userId }),
     );
   }
 
   async updateLot(lotId: number, updatedData: Partial<LotEditableFields>) {
-    return firstValueFrom(
+    return firstValueFrom<LotPayload>(
       this.lotsClient.send('update_lot', { id: lotId, data: updatedData }),
     );
   }
@@ -50,11 +50,7 @@ export class LotsService {
   }
 
   async deleteLot(lotId: number) {
-    return firstValueFrom(this.lotsClient.send('delete_lot', lotId));
-  }
-
-  async doesLotExist(lotId: number) {
-    return firstValueFrom(this.lotsClient.send('does_lot_exist', lotId));
+    return firstValueFrom<void>(this.lotsClient.send('delete_lot', lotId));
   }
 
   async findAvailableSpotId(
@@ -125,5 +121,13 @@ export class LotsService {
         lot: reservedLot,
       };
     });
+  }
+
+  async getLotsFromSpotIds(spotIds: number[]) {
+    return firstValueFrom(
+      this.lotsClient.send<GetLotsFromSpotIdsDto | null>('get_lots_from_spot_ids', {
+        spotIds,
+      }),
+    );
   }
 }

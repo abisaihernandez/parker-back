@@ -225,4 +225,12 @@ export class ReservationsService {
 
     return canceledReservation;
   }
+
+  async getReservations(madeByUserId: number) {
+    const result = await this.dbService.db.query.reservation.findMany({
+      where: eq(reservation.userId, madeByUserId),
+    });
+
+    return result;
+  }
 }

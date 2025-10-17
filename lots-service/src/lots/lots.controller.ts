@@ -66,4 +66,9 @@ export class LotsController {
   async getOwnedSpotIds({ ownerId }: { ownerId: number }) {
     return this.lotsService.getOwnedSpotIds(ownerId);
   }
+
+  @MessagePattern('get_lots_from_spot_ids')
+  async getLotsFromSpotIds({ spotIds }: { spotIds: number[]}) {
+    return this.lotsService.getLotsFromSpotIds(spotIds)
+  }
 }
