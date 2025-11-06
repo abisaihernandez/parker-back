@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module';
 import { LotsModule } from './lots/lots.module';
 import { ReservationsModule } from './reservations/reservations.module';
 import { SpotsModule } from './spots/spots.module';
+import { AvailabilityForecastModule } from './availability-forecast/availability-forecast.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SpotsModule } from './spots/spots.module';
     LotsModule,
     ReservationsModule,
     SpotsModule,
+    AvailabilityForecastModule,
   ],
   controllers: [],
   providers: [],
