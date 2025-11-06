@@ -1,7 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LOTS_SERVICE } from 'src/constants/services';
-import { Bounds, GetLotsFromSpotIdsDto, LotEditableFields, LotPayload } from './types';
+import {
+  Bounds,
+  GetLotsFromSpotIdsDto,
+  LotEditableFields,
+  LotPayload,
+} from './types';
 import { firstValueFrom } from 'rxjs';
 import { ReservationsService } from 'src/reservations/reservations.service';
 
@@ -43,6 +48,8 @@ export class LotsService {
     withAvailability?: boolean;
     bounds?: Bounds;
     ownerId?: number;
+    availabilityForecastDay?: number;
+    availabilityForecastHour?: number;
   }) {
     return firstValueFrom(
       this.lotsClient.send<LotPayload[]>('get_lots', config),
@@ -125,9 +132,12 @@ export class LotsService {
 
   async getLotsFromSpotIds(spotIds: number[]) {
     return firstValueFrom(
-      this.lotsClient.send<GetLotsFromSpotIdsDto | null>('get_lots_from_spot_ids', {
-        spotIds,
-      }),
+      this.lotsClient.send<GetLotsFromSpotIdsDto | null>(
+        'get_lots_from_spot_ids',
+        {
+          spotIds,
+        },
+      ),
     );
   }
 }

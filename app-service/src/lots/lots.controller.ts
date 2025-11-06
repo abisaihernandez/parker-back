@@ -32,6 +32,8 @@ export class LotsController {
     return this.lotsService.getLots({
       withAvailability: query.with_availability,
       bounds: query.bounds,
+      availabilityForecastDay: query.availability_forecast_day,
+      availabilityForecastHour: query.availability_forecast_day,
     });
   }
 

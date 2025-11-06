@@ -37,6 +37,16 @@ export class GetLotsQueryDto {
   @IsOptional()
   @Type(() => Boolean)
   with_availability?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  availability_forecast_day?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  availability_forecast_hour?: number;
 }
 
 export type LotEditableFields = {
