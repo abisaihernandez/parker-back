@@ -33,3 +33,21 @@ local-service-mesh:
 	minikube start
 	kubectl create configmap firebase-config --from-file=./identity-service/src/firebase/credentials/service-account-file.json
 	./istio-setup.sh
+
+app-logs:
+	docker compose logs app-service
+
+app-logs-live:
+	docker compose logs app-service -f
+
+lots-logs:
+	docker compose logs lots-service
+
+lots-logs-live:
+	docker compose logs lots-service -f
+
+reservations-logs:
+	docker compose logs reservations-service
+
+reservations-logs-live:
+	docker compose logs reservations-service -f
