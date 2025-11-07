@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AvailabilityForecastService } from './availability-forecast.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  providers: [AvailabilityForecastService]
+  imports: [HttpModule],
+  providers: [AvailabilityForecastService],
+  exports: [AvailabilityForecastService],
 })
 export class AvailabilityForecastModule {}

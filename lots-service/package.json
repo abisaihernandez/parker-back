@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@knaadh/nestjs-drizzle-pg": "^1.2.0",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -33,6 +34,7 @@
     "@nestjs/swagger": "^11.2.0",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.8",
+    "axios": "^1.13.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "dotenv": "^16.5.0",

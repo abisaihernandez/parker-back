@@ -5,9 +5,11 @@ import { DbModule } from 'src/db/db.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RESERVATIONS_SERVICE } from 'src/constants/services';
 import { ConfigService } from '@nestjs/config';
+import { AvailabilityForecastModule } from 'src/availability-forecast/availability-forecast.module';
 
 @Module({
   imports: [
+    AvailabilityForecastModule,
     DbModule,
     ClientsModule.registerAsync([
       {

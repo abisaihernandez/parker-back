@@ -9,10 +9,14 @@ import {
 import { lot } from 'src/db/schema/lot';
 import { and, count, eq, inArray, sql } from 'drizzle-orm';
 import { spot } from 'src/db/schema/spot';
+import { AvailabilityForecastService } from 'src/availability-forecast/availability-forecast.service';
 
 @Injectable()
 export class LotsService {
-  constructor(private dbService: DbService) {}
+  constructor(
+    private dbService: DbService,
+    private availabilityForecastService: AvailabilityForecastService,
+  ) {}
 
   async createLot(
     ownerId: number,
@@ -73,7 +77,14 @@ export class LotsService {
     withAvailability?: boolean;
     bounds?: Bounds;
     ownerId?: number;
+    availabilityForecastDay?: number;
+    availabilityForecastHour?: number;
   }) {
+    const withAvailabilityForecast =
+      config.withAvailability &&
+      config.availabilityForecastDay &&
+      config.availabilityForecastHour;
+
     const boundsCondition = config.bounds
       ? sql`ST_Contains(ST_MakeEnvelope(${
           config.bounds.southWest.longitude
@@ -89,7 +100,7 @@ export class LotsService {
 
     const query = this.dbService.db
       .select(
-        config.withAvailability
+        config.withAvailability && !withAvailabilityForecast
           ? {
               ...lot,
               availability: sql<number>`COUNT(${spot.id})`,
@@ -100,11 +111,32 @@ export class LotsService {
       .where(lotsFilterCondition);
 
     if (config.withAvailability) {
-      const result = await query
-        .leftJoin(spot, and(eq(lot.id, spot.lotId), eq(spot.isAvailable, true)))
-        .groupBy(lot.id);
+      if (withAvailabilityForecast) {
+        const result = await query;
+        const forecastObject =
+          await this.availabilityForecastService.getLotAvailabilityForecasts(
+            config.availabilityForecastDay!,
+            config.availabilityForecastHour!,
+            result.map(({ id }) => id),
+          );
 
-      return result.map(this.serializeLot);
+        return result.map((lotResult) =>
+          // @ts-ignore -- hehe
+          this.serializeLot({
+            ...lotResult,
+            availability: forecastObject[lotResult.id].predictedAvailability,
+          }),
+        );
+      } else {
+        const result = await query
+          .leftJoin(
+            spot,
+            and(eq(lot.id, spot.lotId), eq(spot.isAvailable, true)),
+          )
+          .groupBy(lot.id);
+
+        return result.map(this.serializeLot);
+      }
     }
 
     const result = await query;
@@ -116,7 +148,7 @@ export class LotsService {
     return this.dbService.db.delete(lot).where(eq(lot.id, lotId));
   }
 
-  serializeLot(lot: LotSelect & { availability?: string }) {
+  serializeLot(lot: LotSelect & { availability?: string | number }) {
     return {
       ...lot,
       location: {
@@ -131,7 +163,6 @@ export class LotsService {
 
   async findAvailableSpot(
     lotId: number,
-    // time: Date = new Date(),
   ): Promise<Pick<typeof spot.$inferSelect, 'id'> | null> {
     const result = await this.dbService.db
       .select({ id: spot.id })
